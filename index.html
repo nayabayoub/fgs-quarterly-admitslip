@@ -260,15 +260,22 @@ document.getElementById("roll").addEventListener("keydown", e => { if(e.key==="E
 document.getElementById("printBtn").onclick = () => window.print();
 document.getElementById("dlBtn").onclick = () => {
   if(!current) return;
-  slip.classList.add("pdf");
-  window.scrollTo(0,0);
+  // Copy of the slip placed at the top-left corner, fixed A4 width, so the PDF is never cropped
+  const holder = document.createElement("div");
+  holder.style.cssText = "position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-1;";
+  const copy = slip.cloneNode(true);
+  copy.classList.add("pdf");
+  copy.style.margin = "0";
+  holder.appendChild(copy);
+  document.body.appendChild(holder);
+  const done = () => holder.remove();
   html2pdf().set({
     margin: 8,
     filename: `Admit-Slip-${current.roll}.pdf`,
     image: { type:"jpeg", quality:0.98 },
-    html2canvas: { scale:2, useCORS:true, scrollX:0, scrollY:0, windowWidth:1000, width:794 },
+    html2canvas: { scale:2, useCORS:true, x:0, y:0, scrollX:0, scrollY:0, windowWidth:794 },
     jsPDF: { unit:"mm", format:"a4", orientation:"portrait" }
-  }).from(slip).save().then(()=>slip.classList.remove("pdf"), ()=>slip.classList.remove("pdf"));
+  }).from(copy).save().then(done, done);
 };
 </script>
 </body>
