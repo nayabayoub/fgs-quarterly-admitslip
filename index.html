@@ -49,7 +49,7 @@
 
   /* ---------- Admit slip (A4) ---------- */
   #slip .short{display:none}
-  #slip.pdf{width:794px !important;max-width:none !important}
+  #slip.pdf{width:100% !important;max-width:none !important;margin:0 !important}
   #slip{width:794px;max-width:100%;margin:0 auto;background:#fff;color:#000;padding:28px 34px;border:3px solid #000;font-family:Arial,sans-serif}
   #slip .s-logo{width:260px;max-width:70%;height:auto;display:block;margin:0 auto 6px}
   #slip .s-school{text-align:center;font-family:Tinos,serif;font-weight:700;font-size:30px;color:var(--maroon);margin:4px 0 0}
@@ -260,22 +260,17 @@ document.getElementById("roll").addEventListener("keydown", e => { if(e.key==="E
 document.getElementById("printBtn").onclick = () => window.print();
 document.getElementById("dlBtn").onclick = () => {
   if(!current) return;
-  // Copy of the slip placed at the top-left corner, fixed A4 width, so the PDF is never cropped
-  const holder = document.createElement("div");
-  holder.style.cssText = "position:fixed;left:0;top:0;width:794px;background:#fff;z-index:-1;";
-  const copy = slip.cloneNode(true);
-  copy.classList.add("pdf");
-  copy.style.margin = "0";
-  holder.appendChild(copy);
-  document.body.appendChild(holder);
-  const done = () => holder.remove();
+  slip.classList.add("pdf");
+  window.scrollTo(0,0);
+  const done = () => slip.classList.remove("pdf");
   html2pdf().set({
     margin: 8,
     filename: `Admit-Slip-${current.roll}.pdf`,
     image: { type:"jpeg", quality:0.98 },
-    html2canvas: { scale:2, useCORS:true, x:0, y:0, scrollX:0, scrollY:0, windowWidth:794 },
-    jsPDF: { unit:"mm", format:"a4", orientation:"portrait" }
-  }).from(copy).save().then(done, done);
+    html2canvas: { scale:2, useCORS:true, scrollX:0, scrollY:0, windowWidth:1000 },
+    jsPDF: { unit:"mm", format:"a4", orientation:"portrait" },
+    pagebreak: { mode:["avoid-all"] }
+  }).from(slip).save().then(done, done);
 };
 </script>
 </body>
